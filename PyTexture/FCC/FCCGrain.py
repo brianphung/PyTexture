@@ -6,6 +6,7 @@ import kosh
 from math import *
 
 from PyTexture.Orientation import *
+from PyTexture.Grain import Grain
 
 ZERO_TOL = 1e-8
 RD = array([1.,0.,0.])
@@ -15,13 +16,18 @@ TD = array([0.,1.,0.])
 NUM_SYSTEMS = 12
 NUM_PLANES = 4
 
-class FCCGrain(Orientation):
+class FCCGrain(Grain):
 
     '''
-    FCCGrain is derived from the Orientation class.  In addition to the
-    Orientation methods, the FCCGrain class contains methods and members
-    for dealing specifically with FCC grains in an Orthorhombic specimen
-    (e.g. with RD, ND, TD axes).
+    FCCGrain is derived from the Grain (and subsequently, the Orientation) 
+    class.  In addition to the Orientation methods, the FCCGrain class 
+    contains methods and members for dealing specifically with FCC grains 
+    in an Orthorhombic specimen (e.g. with RD, ND, TD axes).
+
+
+    DEV NOTE: many member functions lack the conventional 'self' argument,
+    but rather use "O" (for orientation). Since FCCGrain inherits from 
+    the Orientation class, "O" effectively is 'self'.
     '''
 
     systems = (
@@ -96,13 +102,14 @@ class FCCGrain(Orientation):
                          [ 0.0, 1.0 , -1.0]])
                }
 
-    #############################################
-    def __init__(self,conv='passive',ortho=True):
+    # #############################################
+    # BRP: Moved to Grain superclass 4/25/23
+    # def __init__(self,conv='passive',ortho=True, **kwargs):
 
-        self.has_ortho_symm = ortho
-        self.valid = True
-        self.R = eye(3)
-        self._conv = conv
+    #     self.has_ortho_symm = ortho
+    #     self.valid = True
+    #     self.R = eye(3)
+    #     self._conv = conv
 
     #############################################
     def areEquivalent(self,other,verbose=False):

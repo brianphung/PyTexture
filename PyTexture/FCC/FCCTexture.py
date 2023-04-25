@@ -1,8 +1,10 @@
-import PyTexture.FCC.FCCGrain
+import PyTexture.FCC.FCCGrain as FCCGrain
 from joblib.numpy_pickle_utils import xrange
 
 from numpy import *
 from PyTexture.FCC.FCCGrain import *
+
+from PyTexture.Texture import Texture
 
 ZERO_TOL = 1e-8
 R2D = 180.0 / pi
@@ -11,46 +13,47 @@ ND = array([0., 0., 1.])
 TD = array([0., 1., 0.])
 
 
-class FCCTexture:
+class FCCTexture(Texture):
     '''
     FCCTexture is a wrapper class for the FCCGrain class.
     FCCTexture defines members and methods to organize/generate/modify
     more than two FCCGrain objects at a time, e.g. a polycrystal.
     '''
 
-    ##############################################
-    def __init__(self, ortho=True):
-        '''
-        The attributes here are the microstructure attributes you would find
-        in the grain structure of a polycrystal.
+    # BRP: Moved to Texture superclass 3/25/23
+    # ##############################################
+    # def __init__(self, ortho=True):
+    #     '''
+    #     The attributes here are the microstructure attributes you would find
+    #     in the grain structure of a polycrystal.
 
-        '''
+    #     '''
 
-        self.orientDict = {} # a dictionary of Orientation objects 
-        self.eulerDict = {}
-        self.rodDict = {}
-        self.neighbors = {}
-        self.otherNeighbors = {}
-        self.misorient = {}
-        self.primary_slip = {}
-        self.mp = {}
-        self.attrData = {}
+    #     self.orientDict = {} # a dictionary of Orientation objects 
+    #     self.eulerDict = {}
+    #     self.rodDict = {}
+    #     self.neighbors = {}
+    #     self.otherNeighbors = {}
+    #     self.misorient = {}
+    #     self.primary_slip = {}
+    #     self.mp = {}
+    #     self.attrData = {}
 
-        self.has_ortho_symm = ortho
-        self.fromEulers = False
-        self.fromRodrigues = False
+    #     self.has_ortho_symm = ortho
+    #     self.fromEulers = False
+    #     self.fromRodrigues = False
 
-    ##############################################
-    def addGrain(self, fcco_grain, grain_name):
-        '''
-        add an FCCGrain object to the FCCTexture object
+    # ##############################################
+    # def addGrain(self, fcco_grain, grain_name):
+    #     '''
+    #     add an FCCGrain object to the FCCTexture object
         
-        fcco_grain = FCCGrain object
-        grain_name = any hashable type to be used as dictionary key
+    #     fcco_grain = FCCGrain object
+    #     grain_name = any hashable type to be used as dictionary key
 
-        '''
+    #     '''
 
-        self.orientDict[grain_name] = fcco_grain
+    #     self.orientDict[grain_name] = fcco_grain
 
     ##############################################
     def fromEulerAnglesFile(self, fname, cols=(0, 1, 2), conv='passive', units='rad'):

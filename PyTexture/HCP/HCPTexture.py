@@ -1,9 +1,11 @@
-import HCPGrain
+import PyTexture.HCP.HCPGrain as HCP
 from joblib.numpy_pickle_utils import xrange
 
 from numpy import *
 from numpy.linalg import inv
-from HCPGrain import *
+from PyTexture.HCP.HCPGrain import *
+
+from PyTexture.Texture import Texture
 
 ZERO_TOL = 1e-8
 R2D = 180.0 / pi
@@ -12,39 +14,41 @@ ND = array([0., 0., 1.])
 TD = array([0., 1., 0.])
 
 
-class HCPTexture:
+class HCPTexture(Texture):
     '''
     HCPTexture is a wrapper class for the HCPGrain class.
     HCPTexture defines members and methods to organize/generate/modify
     more than two FCCGrain objects at a time, e.g. a polycrystal.
     '''
 
-    ##############################################
-    def __init__(self, ortho=True):
-        self.orientDict = {}
-        self.eulerDict = {}
-        self.rodDict = {}
-        self.neighbors = {}
-        self.otherNeighbors = {}
-        self.misorient = {}
-        self.primary_slip = {}
-        self.mp = {}
-        self.attrData = {}
+    # BRP: Moved to Texture superclass 3/25/23
+    # ##############################################
+    # def __init__(self, ortho=True):
+    #     self.orientDict = {}
+    #     self.eulerDict = {}
+    #     self.rodDict = {}
+    #     self.neighbors = {}
+    #     self.otherNeighbors = {}
+    #     self.misorient = {}
+    #     self.primary_slip = {}
+    #     self.mp = {}
+    #     self.attrData = {}
 
-        self.has_ortho_symm = ortho
+    #     self.has_ortho_symm = ortho
 
-        self.fromEulers = False
-        self.fromRodrigues = False
+    #     self.fromEulers = False
+    #     self.fromRodrigues = False
 
-    ##############################################
-    def addGrain(self, hcpo_grain, grain_name):
-        '''
-        add an HCPGrain object to the HCPTexture object
-        hcpo_grain = HCPGrain object
-        grain_name = any hashable type to be used as dictionary key
-        '''
+    # ##############################################
+    # def addGrain(self, hcpo_grain, grain_name):
+    #     '''
+    #     add an HCPGrain object to the HCPTexture object
+    #     hcpo_grain = HCPGrain object
+    #     grain_name = any hashable type to be used as dictionary key
+    #     '''
 
-        self.orientDict[grain_name] = hcpo_grain
+    #     self.orientDict[grain_name] = hcpo_grain
+
     # TODO: add a to_file boolean that gives the option to put into a file instead of default.
     ##############################################
     def fromEulerAnglesFile(self, fname, cols=(0, 1, 2), conv='passive', units='rad'):

@@ -5,7 +5,8 @@ from numpy.linalg import norm
 
 from math import *
 
-from Orientation import *
+from PyTexture.Orientation import *
+from PyTexture.Grain import Grain
 
 ZERO_TOL = 1e-8
 RD = array([1.,0.,0.])
@@ -15,13 +16,14 @@ TD = array([0.,1.,0.])
 NUM_SYSTEMS = 12 # thru pyramidal a
 NUM_PLANES = 10
 
-class HCPGrain(Orientation):
+class HCPGrain(Grain):
 
     '''
-    HCPGrain is derived from the Orientation class.  In addition to the
-    Orientation methods, the HCPGrain class contains methods and members
-    for dealing specifically with HCP grains in an Orthorhombic specimen
-    (e.g. with RD, ND, TD axes).
+
+    HCPGrain is derived from the Grain (and subsequently, the Orientation) 
+    class.  In addition to the Orientation methods, the HCPGrain class 
+    contains methods and members for dealing specifically with HCP grains 
+    in an Orthorhombic specimen (e.g. with RD, ND, TD axes).
     '''
 
     systems = (
@@ -91,13 +93,14 @@ class HCPGrain(Orientation):
                }
 
 
-    #############################################
-    def __init__(self,conv='passive',ortho=True):
+    # #############################################
+    # BRP: Moved to Grain superclass 4/25/23
+    # def __init__(self,conv='passive',ortho=True):
 
-        self.has_ortho_symm = ortho
-        self.valid = True
-        self.R = eye(3)
-        self._conv = conv
+    #     self.has_ortho_symm = ortho
+    #     self.valid = True
+    #     self.R = eye(3)
+    #     self._conv = conv
 
     #############################################
     def areEquivalent(self,other,verbose=False):
