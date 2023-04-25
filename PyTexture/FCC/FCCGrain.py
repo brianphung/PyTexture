@@ -5,7 +5,7 @@ import kosh
 
 from math import *
 
-from Orientation import *
+from PyTexture.Orientation import *
 
 ZERO_TOL = 1e-8
 RD = array([1.,0.,0.])

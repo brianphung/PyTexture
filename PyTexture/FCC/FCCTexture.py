@@ -1,8 +1,8 @@
-import FCCGrain
+import PyTexture.FCC.FCCGrain
 from joblib.numpy_pickle_utils import xrange
 
 from numpy import *
-from FCCGrain import *
+from PyTexture.FCC.FCCGrain import *
 
 ZERO_TOL = 1e-8
 R2D = 180.0 / pi
