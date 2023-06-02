@@ -15,14 +15,20 @@ class Grain(Orientation):
         self.R = eye(3)
         self._conv = conv
 
+        self.attributes = {}
+
         # Allow assignment of eulers when instantiating class
         if 'euler' in kwargs:
             self.fromEulerAngles(kwargs['euler'])
+        # Define special kwargs that have specific functions
+        attribute_kwargs = ['aspect_ratios', 'axis_lengths', 'centroid', 'volume',
+                            'surface_feature', 'FIP_max', 'delta_FIP_max',
+                            'quats', 'omega3', 'phases',
+                            'applied_strain']
+
         # Process kwargs
-        self.aspect_ratios = kwargs['aspect_ratios'] if 'aspect_ratios' in kwargs else None
-        self.axis_lengths = kwargs['axis_lengths'] if 'axis_lengths' in kwargs else None
-        self.centroid = kwargs['centroid'] if 'centroid' in kwargs else None
-        self.volume = kwargs['volume'] if 'volume' in kwargs else None
-        self.surface_feature = kwargs['surface_feature'] if 'surface_feature' in kwargs else None
-        self.fip_max = kwargs['FIP_max'] if 'FIP_max' in kwargs else None
-        self.delta_fip_max = kwargs['delta_FIP_max'] if 'delta_FIP_max' in kwargs else None
+        for kwarg_key, kwarg_value in kwargs.items():
+            if kwarg_key in attribute_kwargs:
+                self.attributes[kwarg_key] = kwarg_value
+            else:
+                self.attributes[kwarg_key] = None

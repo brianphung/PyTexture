@@ -492,48 +492,49 @@ class HCPTexture(Texture):
                     misorient = 0.0
                     self.misorient['Grain_{}'.format(orient1 + 1)].append(misorient)
 
-    ##############################################
-    def calc_mPrime(self):
-        '''
-        This function calculates the m' compatibility parameter for
-        slip transmission (Luster & Morris).
-        :return: None
-        '''
+    # BRP: Moved to superclass
+    # ##############################################
+    # def calc_mPrime(self):
+    #     '''
+    #     This function calculates the m' compatibility parameter for
+    #     slip transmission (Luster & Morris).
+    #     :return: None
+    #     '''
 
-        for orient1 in self.orientDict.keys():
-            self.mp['Grain_{}'.format(orient1 + 1)] = []
-            # find vecs
-            n1 = self.primary_slip['Grain_{}'.format(orient1 + 1)][1]  # normal of first slip system
-            d1 = self.primary_slip['Grain_{}'.format(orient1 + 1)][2] # direction of first slip (Burger's vector)
-            for orient2 in self.orientDict.keys():
-                # find vecs
-                n2 = self.primary_slip['Grain_{}'.format(orient2 + 1)][1] # normal of second slip system
-                d2 = self.primary_slip['Grain_{}'.format(orient2 + 1)][2] # direction of second slip (Burger's vector)
-                if (orient1 != orient2):
-                    #rotate slip normal and direction to grain orientation
-                    n1 = self.orientDict[orient1]._normalize(dot(self.orientDict[orient1].R,n1))
-                    d1 = self.orientDict[orient1]._normalize(dot(self.orientDict[orient1].R,d1))
-                    n2 = self.orientDict[orient2]._normalize(dot(self.orientDict[orient2].R,n2))
-                    d2 = self.orientDict[orient2]._normalize(dot(self.orientDict[orient2].R,d2))
+    #     for orient1 in self.orientDict.keys():
+    #         self.mp['Grain_{}'.format(orient1 + 1)] = []
+    #         # find vecs
+    #         n1 = self.primary_slip['Grain_{}'.format(orient1 + 1)][1]  # normal of first slip system
+    #         d1 = self.primary_slip['Grain_{}'.format(orient1 + 1)][2] # direction of first slip (Burger's vector)
+    #         for orient2 in self.orientDict.keys():
+    #             # find vecs
+    #             n2 = self.primary_slip['Grain_{}'.format(orient2 + 1)][1] # normal of second slip system
+    #             d2 = self.primary_slip['Grain_{}'.format(orient2 + 1)][2] # direction of second slip (Burger's vector)
+    #             if (orient1 != orient2):
+    #                 #rotate slip normal and direction to grain orientation
+    #                 n1 = self.orientDict[orient1]._normalize(dot(self.orientDict[orient1].R,n1))
+    #                 d1 = self.orientDict[orient1]._normalize(dot(self.orientDict[orient1].R,d1))
+    #                 n2 = self.orientDict[orient2]._normalize(dot(self.orientDict[orient2].R,n2))
+    #                 d2 = self.orientDict[orient2]._normalize(dot(self.orientDict[orient2].R,d2))
 
-                    # check orthogonality
-                    assert dot(n1,d1) < 1.0E-4, 'Grain vectors not orthogonal'
-                    assert dot(n2,d2) < 1.0E-4, 'Neighbor vectors not orthogonal'
+    #                 # check orthogonality
+    #                 assert dot(n1,d1) < 1.0E-4, 'Grain vectors not orthogonal'
+    #                 assert dot(n2,d2) < 1.0E-4, 'Neighbor vectors not orthogonal'
 
-                    #phi
-                    uv1 = n1 / np.linalg.norm(n1)
-                    uv2 = n2 / np.linalg.norm(n2)
-                    cos_phi = dot(uv1, uv2)
+    #                 #phi
+    #                 uv1 = n1 / np.linalg.norm(n1)
+    #                 uv2 = n2 / np.linalg.norm(n2)
+    #                 cos_phi = dot(uv1, uv2)
 
-                    #kappa
-                    uv1 = d1 / np.linalg.norm(d1)
-                    uv2 = d2 / np.linalg.norm(d2)
-                    cos_kappa = dot(uv1, uv2)
+    #                 #kappa
+    #                 uv1 = d1 / np.linalg.norm(d1)
+    #                 uv2 = d2 / np.linalg.norm(d2)
+    #                 cos_kappa = dot(uv1, uv2)
 
-                    mp = cos_phi * cos_kappa
-                    self.mp['Grain_{}'.format(orient1 + 1)].append(mp)
-                else:
-                    self.mp['Grain_{}'.format(orient1 + 1)].append(np.nan)
+    #                 mp = cos_phi * cos_kappa
+    #                 self.mp['Grain_{}'.format(orient1 + 1)].append(mp)
+    #             else:
+    #                 self.mp['Grain_{}'.format(orient1 + 1)].append(np.nan)
     ##############################################
     def binCloselyOrientedOther(self, other, binsize):
         '''
