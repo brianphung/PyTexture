@@ -6,11 +6,14 @@ such as misorientations and slip transmission.
 PyTexture can also be used to randomly generate grain orientations if no data exists. 
 
 # Install
-As this is currently in development, the best way to isntall this is via pip development mode.
+As this is currently in development, the best way to install this is via pip development mode.
 
 1. Clone the directory.
 2. Navigate to the directory.
 3. Use:
+
 ```pip install --editable .```
+
 4. Test that this was successful via:
+
 ```python -c 'import PyTexture'```
