@@ -18,9 +18,9 @@ class Texture:
         self.rodDict = {}
         self.neighbors = {}
         self.otherNeighbors = {}
-        self.misorient = {}
+        self.misorient = None
         self.primary_slip = {}
-        self.mp = {}
+        self.mp = None
         self.attrData = {}
         self.shared_area = {}
         self.additional_data = {}
@@ -49,22 +49,23 @@ class Texture:
         slip transmission (Luster & Morris).
         :return: None
         '''
-
+        num_of_grains = len(self.orientDict.keys())
+        self.mp =  np.full((num_of_grains,num_of_grains), np.nan)
         
 
-
-        for orient1 in self.orientDict.keys():
+        assert(grain_ids_start_at_zero == False) # Yeah, I'm breaking this code
+        for index, orient1 in enumerate(self.orientDict.keys()):
             
             # find vecs
             cur_id = 'Grain_{}'.format(orient1 + 1) if grain_ids_start_at_zero else 'Grain_{}'.format(orient1)
-            self.mp[cur_id] = []
+            #self.mp[cur_id] = []
             n1 = self.primary_slip[cur_id][1]  # normal of first slip system
             d1 = self.primary_slip[cur_id][2] # direction of first slip (Burger's vector)
             if neighbors_only:
                 assert(grain_ids_start_at_zero == False), 'Only supports this'
                 second_loop_orientation_list = self.neighbors[f'Grain_{orient1}']
             else:
-                second_loop_orientation_list = self.orientDict.keys()
+                second_loop_orientation_list = list(self.orientDict.keys())[index:]
             for orient2 in second_loop_orientation_list:
                 # find vecs
                 other_id = 'Grain_{}'.format(orient2 + 1) if grain_ids_start_at_zero else 'Grain_{}'.format(orient2)
@@ -92,9 +93,11 @@ class Texture:
                     cos_kappa = dot(uv1, uv2)
 
                     mp = cos_phi * cos_kappa
-                    self.mp[cur_id].append(mp)
+                    self.mp[orient1-1, orient2-1] = mp
+                    self.mp[orient2-1, orient1-1] = mp
                 else:
-                    self.mp[cur_id].append(np.nan)
+                    self.mp[orient1-1, orient2-1] = np.nan
+                    self.mp[orient2-1, orient1-1] = np.nan
 
     ##############################################
     def export_pandas(self,features, **kwargs):

@@ -177,6 +177,28 @@ class FCCTexture(Texture):
                 print("error getting euler angles for angle %0.2f" % theta)
 
     ##############################################
+    def calc_primary_slip(self):
+        '''
+        writes a file containing Bunge-Euler angles with
+        3 additional columns: max Schmid factor, nearness to
+        the ND-rotated cube orientation, and nearness to planar
+        double slip orientation
+        fd = open file object
+        out = 'rad' or 'deg'
+        '''
+
+        for idx,theta in enumerate(self.orientDict):
+            
+            cur_orient = self.orientDict[theta]
+            m,n,d = cur_orient.maxSchmidFactor()
+            # find min angle slip direction
+            self.primary_slip['Grain_{}'.format(idx + 1)] = [m,n,d]
+
+            #min_nd_rotated = cur_orient.getAlignment(FCCGrain.families[100], ND)
+            #min_planar_double = cur_orient.getAlignment(FCCGrain.families[111], TD)
+
+
+    ##############################################
     def toRodriguesFile(self, fd, out='rad'):
         '''
         writes the Rodrigues parameters for each orientation
@@ -485,23 +507,28 @@ class FCCTexture(Texture):
                         self.neighbors[orient1].add(orient2)
 
     ##############################################
-    def misorientations(self):
+    def misorientations(self, grain_ids_start_at_zero):
         '''
         build the "misorientations" dictionary of sets
         self.neighbors:
             key: Orientation key in "self"
             values: max misorientations of neighboring grains
         '''
+        assert(grain_ids_start_at_zero == False) # Yeah, I'm breaking this code
+        num_of_grains = len(self.orientDict.keys())
+        self.misorient =  np.full((num_of_grains,num_of_grains), np.nan)
+        #print(self.misorient.shape)
 
-        for orient1 in self.orientDict.keys():
-            self.misorient['Grain_{}'.format(orient1 + 1)] = []
-            for orient2 in self.orientDict.keys():
+        for index, orient1 in enumerate(self.orientDict.keys()):
+            for orient2 in list(self.orientDict.keys())[index:]:
                 if (orient1 != orient2):
                     misorient = self.orientDict[orient1].misorientation(self.orientDict[orient2])
-                    self.misorient['Grain_{}'.format(orient1 + 1)].append(misorient) # gather misorientation angles
+                    self.misorient[orient1-1, orient2-1] = misorient
+                    self.misorient[orient2-1, orient1-1] = misorient
                 else:
                     misorient = 0.0
-                    self.misorient['Grain_{}'.format(orient1 + 1)].append(misorient)
+                    self.misorient[orient1-1, orient2-1] = misorient
+                    self.misorient[orient2-1, orient1-1] = misorient
                     
     # BRP: Moved to superclass
     # ##############################################

@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import array,float64,dot,cross,zeros,outer
 from numpy.linalg import norm
-import kosh
+#import kosh
 
 from math import *
 
@@ -30,26 +30,42 @@ class FCCGrain(Grain):
     the Orientation class, "O" effectively is 'self'.
     '''
 
+    # systems = (
+    #             array([1.0, -1.0, 0.0], dtype=float64),
+    #             array([ -1.0, 0.0, 1.0], dtype=float64),
+    #             array([ 0.0, 1.0 , -1.0], dtype=float64),
+    #             array([ 1.0, 0.0 , 1.0], dtype=float64),
+    #             array([ -1.0, -1.0 , 0.0], dtype=float64),
+    #             array([ 0.0, 1.0 , -1.0], dtype=float64),
+    #             array([ -1.0, 0.0 , 1.0], dtype=float64),
+    #             array([ 0.0, -1.0 , -1.0], dtype=float64),
+    #             array([ 1.0, 1.0 , 0.0], dtype=float64),
+    #             array([ -1.0, 1.0, 0.0], dtype=float64),
+    #             array([ 1.0, 0.0 , 1.0], dtype=float64),
+    #             array([ 0.0, -1.0 , -1.0], dtype=float64)
+    #             )
+    # Changing systems to match FFT. Invalidates the operators?
+    # But they should be equivalent since it's the 12 FCC systems
     systems = (
-                array([1.0, -1.0, 0.0], dtype=float64),
-                array([ -1.0, 0.0, 1.0], dtype=float64),
+                array([0, 1.0, 1.0], dtype=float64),
+                array([ 1.0, 0.0, 1.0], dtype=float64),
+                array([ 1.0, -1.0 , 0.0], dtype=float64),
                 array([ 0.0, 1.0 , -1.0], dtype=float64),
                 array([ 1.0, 0.0 , 1.0], dtype=float64),
-                array([ -1.0, -1.0 , 0.0], dtype=float64),
-                array([ 0.0, 1.0 , -1.0], dtype=float64),
-                array([ -1.0, 0.0 , 1.0], dtype=float64),
-                array([ 0.0, -1.0 , -1.0], dtype=float64),
                 array([ 1.0, 1.0 , 0.0], dtype=float64),
-                array([ -1.0, 1.0, 0.0], dtype=float64),
-                array([ 1.0, 0.0 , 1.0], dtype=float64),
-                array([ 0.0, -1.0 , -1.0], dtype=float64)
+                array([ 0.0, 1.0 , 1.0], dtype=float64),
+                array([ 1.0, 0.0 , -1.0], dtype=float64),
+                array([ 1.0, 1.0 , 0.0], dtype=float64),
+                array([ 0.0, 1.0, -1.0], dtype=float64),
+                array([ 1.0, 0.0 , -1.0], dtype=float64),
+                array([ 1.0, -1.0 , 0.0], dtype=float64)
                 )
 
     planes = (
-              array([1.0, 1.0, 1.0], dtype=float64),
-              array([ -1.0,1.0 ,1.0], dtype=float64),
+              array([1.0, 1.0, -1.0], dtype=float64),
+              array([ 1.0,-1.0 ,-1.0], dtype=float64),
               array([ 1.0,-1.0 ,1.0], dtype=float64),
-              array([ -1.0,-1.0 ,1.0], dtype=float64)
+              array([ 1.0,1.0 ,1.0], dtype=float64)
               )
 
     ortho_symm_opers = (
@@ -170,7 +186,7 @@ class FCCGrain(Grain):
         for i,plane in enumerate(FCCGrain.planes):
             plane = Orientation._normalize(plane)
             rot_plane[i,:] = Orientation._normalize(dot(O.R,plane))
-
+        O.rot_plane = rot_plane
         return rot_plane
     ##############################################
     def schmidTensors(O,spec_sys=None):
@@ -275,20 +291,45 @@ class FCCGrain(Grain):
             schmid_factors[i] = fabs(cos(psi) * cos(xi))
             normal[i] = fcc_plane # normals of planes
             direction[i] = sys # directions of slip
-
+            O.schmid_factors = schmid_factors
+            O.normals = normal
+            O.direction = direction
         return schmid_factors,normal,direction
     ##############################################
-    def maxSchmidFactor(O,load_vec):
+    def maxSchmidFactor(O):
         '''
         returns the maximum Schmid factor
         load_vec = 3-D numpy array specifying load axis
         '''
-
-        m,n,d = O.schmidFactors(load_vec)
+        O.schmidFactors([0,0,1])
+        m = O.schmid_factors
+        n = O.normals
+        d = O.direction
         max_schmid = max(m)
         max_plane = n[np.argmax(np.array(m))]
         max_direction = d[np.argmax(np.array(m))]
         return max_schmid,max_plane,max_direction
+    ##############################################
+    def calculate_effective_elastic_modulus(self, elastic_moduli, loading_dir=[0,0,1]):
+
+        C11 = elastic_moduli['C11']
+        C12 = elastic_moduli['C12']
+        C44 = elastic_moduli['C44']
+        S11 = (C11 + C12) / ((C11 - C12) * (C11 + 2 * C12))
+        S12 = -C12 / ((C11 - C12) * (C11 + 2 * C12))
+        S44 = 1. / C44
+
+        hkl = self.R @ loading_dir
+
+        alpha = np.dot(hkl, [1, 0, 0]) / \
+        (np.linalg.norm(hkl) * np.linalg.norm([1, 0, 0]))
+        beta = np.dot(hkl, [0, 1, 0]) / \
+        (np.linalg.norm(hkl) * np.linalg.norm([0, 1, 0]))
+        gamma = np.dot(hkl, [0, 0, 1]) / \
+        (np.linalg.norm(hkl) * np.linalg.norm([0, 0, 1]))
+        E_hkl = 1 / (S11 - 2 * (S11 - S12 - 0.5 * S44) * \
+                        (alpha**2 * beta**2 + beta**2 * gamma**2 + alpha**2 * gamma**2))
+        return E_hkl
     ##############################################
     def taylorFactors(self):
         '''
@@ -562,6 +603,7 @@ class FCCGrain(Grain):
                     if Orientation._fequals(dir_cos, -1.0):
                         misorientation = pi
                     else:
+                        dir_cos = np.clip(dir_cos, -1, 1)
                         misorientation = acos(dir_cos)
                 except ValueError:
                     print("direction cosine = ", dir_cos)
